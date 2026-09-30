@@ -3,14 +3,27 @@ import Link from 'next/link';
 
 const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 
-// Ժանրերի ID-ների անունների քարտեզագրում վերնագրի համար
-const GENRE_NAMES: Record<string, string> = {
-  '28': 'Action',
-  '35': 'Comedy',
-  '18': 'Drama',
-  '878': 'Sci-Fi',
-  '27': 'Horror',
-};
+const GENRES = [
+  { id: '28', name: 'Action' },
+  { id: '12', name: 'Adventure' },
+  { id: '16', name: 'Animation' },
+  { id: '35', name: 'Comedy' },
+  { id: '80', name: 'Crime' },
+  { id: '99', name: 'Documentary' },
+  { id: '18', name: 'Drama' },
+  { id: '10751', name: 'Family' },
+  { id: '14', name: 'Fantasy' },
+  { id: '36', name: 'History' },
+  { id: '27', name: 'Horror' },
+  { id: '10402', name: 'Music' },
+  { id: '9648', name: 'Mystery' },
+  { id: '10749', name: 'Romance' },
+  { id: '878', name: 'Science Fiction' },
+  { id: '10770', name: 'TV Movie' },
+  { id: '53', name: 'Thriller' },
+  { id: '10752', name: 'War' },
+  { id: '37', name: 'Western' },
+];
 
 interface Movie {
   id: number;
@@ -20,7 +33,6 @@ interface Movie {
   vote_average?: number;
 }
 
-// Գլխավոր ցուցակի ֆիլմեր (Search, Genre, կամ Category)
 async function getMovies(category = 'popular', page = 1, query = '', genre = '') {
   const apiKey = process.env.TMDB_API_KEY;
 
@@ -93,18 +105,18 @@ export default async function HomePage({
     getUpcomingMovies(),
   ]);
 
-  // Որոշում ենք վերնագիրը
+  const selectedGenreObj = GENRES.find((g) => g.id === currentGenre);
   let pageTitle = `${currentCategory.replace('_', ' ')} Movies`;
   if (searchQuery) {
     pageTitle = `Search Results for: "${searchQuery}"`;
-  } else if (currentGenre) {
-    pageTitle = `${GENRE_NAMES[currentGenre] || 'Genre'} Movies`;
+  } else if (selectedGenreObj) {
+    pageTitle = `${selectedGenreObj.name} Movies`;
   }
 
   return (
-    <main className="p-6 max-w-[1400px] mx-auto min-h-screen text-white space-y-8">
+    <main className="p-6 max-w-375 mx-auto min-h-screen text-white space-y-8">
       
-      {/* --- 1. ՎԵՐԵՎԻ BAR: Top Rated Movies Slider --- */}
+      {/* 1. TOP RATED SLIDER */}
       {!searchQuery && !currentGenre && (
         <section className="bg-gray-900/60 border border-gray-800 rounded-2xl p-5">
           <div className="flex items-center justify-between mb-4">
@@ -119,7 +131,7 @@ export default async function HomePage({
               <Link
                 key={movie.id}
                 href={`/movie/${movie.id}`}
-                className="w-36 flex-shrink-0 bg-gray-950 border border-gray-800 rounded-xl overflow-hidden hover:scale-105 transition duration-200 group"
+                className="w-36 shrink-0 bg-gray-950 border border-gray-800 rounded-xl overflow-hidden hover:scale-105 transition duration-200 group"
               >
                 <div className="h-48 relative bg-gray-800">
                   {movie.poster_path ? (
@@ -127,6 +139,7 @@ export default async function HomePage({
                       src={`${IMAGE_BASE_URL}${movie.poster_path}`}
                       alt={movie.title}
                       fill
+                      sizes="144px"
                       className="object-cover"
                     />
                   ) : (
@@ -152,16 +165,52 @@ export default async function HomePage({
         </section>
       )}
 
-      {/* --- 2. ՀԻՄՆԱԿԱՆ ԲՈՎԱՆԴԱԿՈՒԹՅՈՒՆ ԵՎ SIDEBAR --- */}
+      {/* 2. MAIN CONTENT LAYOUT */}
       <div className="flex flex-col lg:flex-row gap-8">
         
-        {/* --- ՁԱԽ ՄԱՍ: Main Content --- */}
+        {/* ՁԱԽ SIDEBAR: Genres */}
+        <aside className="w-full lg:w-64 shrink-0">
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 sticky top-20">
+            <h2 className="text-lg font-bold mb-4 text-gray-200 flex items-center justify-between">
+              <span>🎭 Genres</span>
+              {currentGenre && (
+                <Link
+                  href="/"
+                  className="text-xs text-blue-400 hover:underline font-normal"
+                >
+                  Clear filter
+                </Link>
+              )}
+            </h2>
+
+            <div className="flex flex-wrap lg:flex-col gap-1.5 max-h-[60vh] lg:max-h-[calc(100vh-180px)] overflow-y-auto pr-1 text-sm scrollbar-thin">
+              {GENRES.map((g) => {
+                const isActive = currentGenre === g.id;
+                return (
+                  <Link
+                    key={g.id}
+                    href={`/?genre=${g.id}`}
+                    className={`px-3 py-2 rounded-xl transition text-xs sm:text-sm font-medium flex items-center justify-between ${
+                      isActive
+                        ? 'bg-blue-600 text-white font-bold shadow-md shadow-blue-600/30'
+                        : 'bg-gray-950/60 lg:bg-transparent text-gray-400 hover:text-white hover:bg-gray-800/80 border border-gray-800 lg:border-none'
+                    }`}
+                  >
+                    <span>{g.name}</span>
+                    {isActive && <span className="text-xs">✓</span>}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </aside>
+
+        {/* ՄԵՋՏԵՂԻ ՄԱՍ: Main Content */}
         <div className="flex-1">
           <h1 className="text-2xl font-bold mb-4 capitalize">
             {pageTitle}
           </h1>
 
-          {/* Կատեգորիայի կոճակներ (ցուցադրվում են միայն եթե որոնում կամ ժանր ընտրված չէ) */}
           {!searchQuery && !currentGenre && (
             <div className="flex gap-3 mb-6">
               <Link
@@ -187,13 +236,12 @@ export default async function HomePage({
             </div>
           )}
 
-          {/* Ֆիլմերի ցանցը */}
           {data.results.length === 0 ? (
             <div className="text-center py-12 text-gray-400 text-lg">
               No movies found.
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
               {data.results.map((movie: Movie) => (
                 <Link
                   key={movie.id}
@@ -209,7 +257,7 @@ export default async function HomePage({
                       className="w-full h-auto object-cover"
                     />
                   ) : (
-                    <div className="h-[250px] bg-gray-800 text-gray-400 flex items-center justify-center">
+                    <div className="h-62․5 bg-gray-800 text-gray-400 flex items-center justify-center">
                       No Image
                     </div>
                   )}
@@ -266,8 +314,8 @@ export default async function HomePage({
           )}
         </div>
 
-        {/* --- ԱՋ ՄԱՍ: Sidebar (Upcoming 2026) --- */}
-        <aside className="w-full lg:w-80 flex-shrink-0">
+        {/* ԱՋ SIDEBAR: Upcoming 2026 */}
+        <aside className="w-full lg:w-72 shrink-0">
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 sticky top-20">
             <h2 className="text-lg font-bold mb-4 text-blue-400 flex items-center justify-between">
               <span>📅 Upcoming (2026)</span>
@@ -279,19 +327,20 @@ export default async function HomePage({
             {upcoming2026.length === 0 ? (
               <p className="text-gray-400 text-sm">No upcoming movies found for 2026.</p>
             ) : (
-              <div className="flex flex-col gap-3 max-h-[calc(100vh-160px)] overflow-y-auto pr-1">
+              <div className="flex flex-col gap-3 max-h-[calc(100vh-180px)] overflow-y-auto pr-1">
                 {upcoming2026.map((movie) => (
                   <Link
                     key={movie.id}
                     href={`/movie/${movie.id}`}
                     className="flex gap-3 bg-gray-950 p-2 rounded-xl border border-gray-800 hover:border-blue-500/50 transition group"
                   >
-                    <div className="w-14 h-18 relative flex-shrink-0 rounded-lg overflow-hidden bg-gray-800">
+                    <div className="w-14 h-18 relative shrink-0 rounded-lg overflow-hidden bg-gray-800">
                       {movie.poster_path ? (
                         <Image
                           src={`${IMAGE_BASE_URL}${movie.poster_path}`}
                           alt={movie.title}
                           fill
+                          sizes="56px"
                           className="object-cover"
                         />
                       ) : (
