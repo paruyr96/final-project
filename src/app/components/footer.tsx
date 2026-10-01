@@ -3,10 +3,10 @@ import Link from 'next/link';
 export default function Footer() {
   return (
     <footer className="bg-gray-950 border-t border-gray-800 text-gray-400 mt-16">
-      <div className="max-w-[1400px] mx-auto px-6 py-12">
+      <div className="max-w-350 mx-auto px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           
-          {/* 1. Լոգո և Նկարագրություն */}
+          {/* 1. logo and description*/}
           <div className="space-y-3">
             <Link href="/" className="text-2xl font-bold text-white flex items-center gap-2">
               🎬 <span className="text-blue-500">Movie</span>App
@@ -16,7 +16,7 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* 2. Արագ Նավիգացիա */}
+          {/* 2. fast navigation*/}
           <div>
             <h3 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">
               Navigation
@@ -40,7 +40,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* 3. Popular Genres (Արդեն ճշգրիտ URL-ներով) */}
+          {/* 3. Popular Genres  */}
           <div>
             <h3 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">
               Popular Genres
@@ -94,7 +94,7 @@ export default function Footer() {
 
         </div>
 
-        {/* Copyright */}
+        {/*5 Copyright */}
         <div className="pt-8 border-t border-gray-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
           <p>© {new Date().getFullYear()} MovieApp. Built with Next.js & Tailwind CSS.</p>
           

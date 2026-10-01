@@ -24,25 +24,25 @@ export default function RegisterPage() {
     e.preventDefault();
     setError('');
 
-    // Պարզ ստուգումներ (Validation)
+    //  (Validation)
     if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
-      setError('Խնդրում ենք լրացնել բոլոր դաշտերը');
+      setError('Please fill in all fields.');
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Գաղտնաբառերը չեն համընկնում');
+      setError('The passwords do not match.');
       return;
     }
 
     if (formData.password.length < 6) {
-      setError('Գաղտնաբառը պետք է լինի առնվազն 6 նիշ');
+      setError('The password must be at least 6 characters long.');
       return;
     }
 
-    // Այստեղ կարող եք ուղարկել տվյալները ձեր Backend API-ին
+    
     console.log('Registered User:', formData);
-    alert('Գրանցումն հաջողությամբ կատարվեց');
+    alert('Registration was successful.');
   };
 
   return (
@@ -55,7 +55,7 @@ export default function RegisterPage() {
           Sign up to get started with MovieApp
         </p>
 
-        {/* Սխալի ցուցադրում */}
+        
         {error && (
           <div className="bg-red-500/10 border border-red-500/50 text-red-400 text-sm p-3 rounded-lg mb-4 text-center">
             {error}

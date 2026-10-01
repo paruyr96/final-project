@@ -11,7 +11,7 @@ export default function Header() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      // Ուղղորդում ենք դեպի որոնման էջ
+      
       router.push(`/?search=${encodeURIComponent(searchQuery.trim())}`);
     }
   };

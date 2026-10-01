@@ -23,12 +23,12 @@ export default function LoginPage() {
     setError('');
 
     if (!formData.email || !formData.password) {
-      setError('Խնդրում ենք լրացնել բոլոր դաշտերը');
+      setError('Please fill in all fields.');
       return;
     }
 
     console.log('Login User:', formData);
-    alert('Մուտքն հաջողությամբ կատարվեց');
+    alert('Login was successful.');
   };
 
   return (

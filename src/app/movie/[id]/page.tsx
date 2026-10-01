@@ -99,7 +99,7 @@ export default async function MovieDetailPage({
            alt={movie.title}
            width={500}
            height={750}
-           priority // 👈 Ավելացրու սա (սա ավտոմատ ավելացնում է loading="eager")
+           priority 
            className="w-full h-auto object-cover"
            />
          ) : (

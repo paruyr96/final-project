@@ -37,7 +37,7 @@ async function getMovies(page = 1, query = '', genre = '') {
   const apiKey = process.env.TMDB_API_KEY;
 
   if (!apiKey) {
-    throw new Error('TMDB_API_KEY-ը գտնված չէ .env.local ֆայլում');
+    throw new Error('TMDB_API_KEY is not found');
   }
 
   let url = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=en-US&page=${page}`;
@@ -113,9 +113,9 @@ export default async function HomePage({
   }
 
   return (
-    <main className="p-6 max-w-[1500px] mx-auto min-h-screen text-white space-y-8">
+    <main className="p-6 max-w-375 mx-auto min-h-screen text-white space-y-8">
       
-      {/* 1. TOP RATED SLIDER */}
+      {/*  TOP RATED SLIDER */}
       {!searchQuery && !currentGenre && (
         <section className="bg-gray-900/60 border border-gray-800 rounded-2xl p-5">
           <div className="flex items-center justify-between mb-4">
@@ -130,7 +130,7 @@ export default async function HomePage({
               <Link
                 key={movie.id}
                 href={`/movie/${movie.id}`}
-                className="w-36 flex-shrink-0 bg-gray-950 border border-gray-800 rounded-xl overflow-hidden hover:scale-105 transition duration-200 group"
+                className="w-36 shrink-0 bg-gray-950 border border-gray-800 rounded-xl overflow-hidden hover:scale-105 transition duration-200 group"
               >
                 <div className="h-48 relative bg-gray-800">
                   {movie.poster_path ? (
@@ -164,11 +164,11 @@ export default async function HomePage({
         </section>
       )}
 
-      {/* 2. MAIN CONTENT LAYOUT */}
+      
       <div className="flex flex-col lg:flex-row gap-8">
         
-        {/* ՁԱԽ SIDEBAR: Genres */}
-        <aside className="w-full lg:w-64 flex-shrink-0">
+        
+        <aside className="w-full lg:w-64 shrink-0">
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 sticky top-20">
             <h2 className="text-lg font-bold mb-4 text-gray-200 flex items-center justify-between">
               <span>🎭 Genres</span>
@@ -204,7 +204,6 @@ export default async function HomePage({
           </div>
         </aside>
 
-        {/* ՄԵՋՏԵՂԻ ՄԱՍ: Main Content (Popular Movies) */}
         <div className="flex-1">
           <h1 className="text-2xl font-bold mb-6 capitalize">
             {pageTitle}
@@ -232,7 +231,7 @@ export default async function HomePage({
                       className="w-full h-auto object-cover"
                     />
                   ) : (
-                    <div className="h-[250px] bg-gray-800 text-gray-400 flex items-center justify-center">
+                    <div className="h-62.5 bg-gray-800 text-gray-400 flex items-center justify-center">
                       No Image
                     </div>
                   )}
@@ -289,8 +288,8 @@ export default async function HomePage({
           )}
         </div>
 
-        {/* ԱՋ SIDEBAR: Upcoming 2026 */}
-        <aside className="w-full lg:w-72 flex-shrink-0">
+        {/* SIDEBAR: Upcoming 2026 */}
+        <aside className="w-full lg:w-72 shrink-0">
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 sticky top-20">
             <h2 className="text-lg font-bold mb-4 text-blue-400 flex items-center justify-between">
               <span>📅 Upcoming (2026)</span>
@@ -309,7 +308,7 @@ export default async function HomePage({
                     href={`/movie/${movie.id}`}
                     className="flex gap-3 bg-gray-950 p-2 rounded-xl border border-gray-800 hover:border-blue-500/50 transition group"
                   >
-                    <div className="w-14 h-18 relative flex-shrink-0 rounded-lg overflow-hidden bg-gray-800">
+                    <div className="w-14 h-18 relative shrink-0 rounded-lg overflow-hidden bg-gray-800">
                       {movie.poster_path ? (
                         <Image
                           src={`${IMAGE_BASE_URL}${movie.poster_path}`}
