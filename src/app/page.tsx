@@ -33,14 +33,14 @@ interface Movie {
   vote_average?: number;
 }
 
-async function getMovies(category = 'popular', page = 1, query = '', genre = '') {
+async function getMovies(page = 1, query = '', genre = '') {
   const apiKey = process.env.TMDB_API_KEY;
 
   if (!apiKey) {
     throw new Error('TMDB_API_KEY-ը գտնված չէ .env.local ֆայլում');
   }
 
-  let url = `https://api.themoviedb.org/3/movie/${category}?api_key=${apiKey}&language=en-US&page=${page}`;
+  let url = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=en-US&page=${page}`;
 
   if (query.trim()) {
     url = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&language=en-US&query=${encodeURIComponent(query)}&page=${page}`;
@@ -91,22 +91,21 @@ async function getUpcomingMovies(): Promise<Movie[]> {
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; category?: string; search?: string; genre?: string }>;
+  searchParams: Promise<{ page?: string; search?: string; genre?: string }>;
 }) {
   const resolvedParams = await searchParams;
   const searchQuery = resolvedParams.search || '';
   const currentGenre = resolvedParams.genre || '';
-  const currentCategory = resolvedParams.category || 'popular';
   const currentPage = Number(resolvedParams.page) || 1;
 
   const [data, topRatedMovies, upcoming2026] = await Promise.all([
-    getMovies(currentCategory, currentPage, searchQuery, currentGenre),
+    getMovies(currentPage, searchQuery, currentGenre),
     getTopRatedMovies(),
     getUpcomingMovies(),
   ]);
 
   const selectedGenreObj = GENRES.find((g) => g.id === currentGenre);
-  let pageTitle = `${currentCategory.replace('_', ' ')} Movies`;
+  let pageTitle = 'Popular Movies';
   if (searchQuery) {
     pageTitle = `Search Results for: "${searchQuery}"`;
   } else if (selectedGenreObj) {
@@ -114,7 +113,7 @@ export default async function HomePage({
   }
 
   return (
-    <main className="p-6 max-w-375 mx-auto min-h-screen text-white space-y-8">
+    <main className="p-6 max-w-[1500px] mx-auto min-h-screen text-white space-y-8">
       
       {/* 1. TOP RATED SLIDER */}
       {!searchQuery && !currentGenre && (
@@ -131,7 +130,7 @@ export default async function HomePage({
               <Link
                 key={movie.id}
                 href={`/movie/${movie.id}`}
-                className="w-36 shrink-0 bg-gray-950 border border-gray-800 rounded-xl overflow-hidden hover:scale-105 transition duration-200 group"
+                className="w-36 flex-shrink-0 bg-gray-950 border border-gray-800 rounded-xl overflow-hidden hover:scale-105 transition duration-200 group"
               >
                 <div className="h-48 relative bg-gray-800">
                   {movie.poster_path ? (
@@ -169,7 +168,7 @@ export default async function HomePage({
       <div className="flex flex-col lg:flex-row gap-8">
         
         {/* ՁԱԽ SIDEBAR: Genres */}
-        <aside className="w-full lg:w-64 shrink-0">
+        <aside className="w-full lg:w-64 flex-shrink-0">
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 sticky top-20">
             <h2 className="text-lg font-bold mb-4 text-gray-200 flex items-center justify-between">
               <span>🎭 Genres</span>
@@ -205,36 +204,11 @@ export default async function HomePage({
           </div>
         </aside>
 
-        {/* ՄԵՋՏԵՂԻ ՄԱՍ: Main Content */}
+        {/* ՄԵՋՏԵՂԻ ՄԱՍ: Main Content (Popular Movies) */}
         <div className="flex-1">
-          <h1 className="text-2xl font-bold mb-4 capitalize">
+          <h1 className="text-2xl font-bold mb-6 capitalize">
             {pageTitle}
           </h1>
-
-          {!searchQuery && !currentGenre && (
-            <div className="flex gap-3 mb-6">
-              <Link
-                href="/?category=popular"
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                  currentCategory === 'popular'
-                    ? 'bg-blue-600 font-bold shadow-lg shadow-blue-600/30'
-                    : 'bg-gray-800 hover:bg-gray-700 text-gray-300'
-                }`}
-              >
-                Popular
-              </Link>
-              <Link
-                href="/?category=now_playing"
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                  currentCategory === 'now_playing'
-                    ? 'bg-blue-600 font-bold shadow-lg shadow-blue-600/30'
-                    : 'bg-gray-800 hover:bg-gray-700 text-gray-300'
-                }`}
-              >
-                Now Playing
-              </Link>
-            </div>
-          )}
 
           {data.results.length === 0 ? (
             <div className="text-center py-12 text-gray-400 text-lg">
@@ -242,7 +216,7 @@ export default async function HomePage({
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
-              {data.results.map((movie: Movie) => (
+              {data.results.map((movie: Movie, index: number) => (
                 <Link
                   key={movie.id}
                   href={`/movie/${movie.id}`}
@@ -254,10 +228,11 @@ export default async function HomePage({
                       alt={movie.title}
                       width={500}
                       height={750}
+                      priority={index < 4}
                       className="w-full h-auto object-cover"
                     />
                   ) : (
-                    <div className="h-62․5 bg-gray-800 text-gray-400 flex items-center justify-center">
+                    <div className="h-[250px] bg-gray-800 text-gray-400 flex items-center justify-center">
                       No Image
                     </div>
                   )}
@@ -282,7 +257,7 @@ export default async function HomePage({
                       ? `/?search=${encodeURIComponent(searchQuery)}&page=${currentPage - 1}`
                       : currentGenre
                       ? `/?genre=${currentGenre}&page=${currentPage - 1}`
-                      : `/?category=${currentCategory}&page=${currentPage - 1}`
+                      : `/?page=${currentPage - 1}`
                   }
                   className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-sm"
                 >
@@ -303,7 +278,7 @@ export default async function HomePage({
                       ? `/?search=${encodeURIComponent(searchQuery)}&page=${currentPage + 1}`
                       : currentGenre
                       ? `/?genre=${currentGenre}&page=${currentPage + 1}`
-                      : `/?category=${currentCategory}&page=${currentPage + 1}`
+                      : `/?page=${currentPage + 1}`
                   }
                   className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm"
                 >
@@ -315,7 +290,7 @@ export default async function HomePage({
         </div>
 
         {/* ԱՋ SIDEBAR: Upcoming 2026 */}
-        <aside className="w-full lg:w-72 shrink-0">
+        <aside className="w-full lg:w-72 flex-shrink-0">
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 sticky top-20">
             <h2 className="text-lg font-bold mb-4 text-blue-400 flex items-center justify-between">
               <span>📅 Upcoming (2026)</span>
@@ -334,7 +309,7 @@ export default async function HomePage({
                     href={`/movie/${movie.id}`}
                     className="flex gap-3 bg-gray-950 p-2 rounded-xl border border-gray-800 hover:border-blue-500/50 transition group"
                   >
-                    <div className="w-14 h-18 relative shrink-0 rounded-lg overflow-hidden bg-gray-800">
+                    <div className="w-14 h-18 relative flex-shrink-0 rounded-lg overflow-hidden bg-gray-800">
                       {movie.poster_path ? (
                         <Image
                           src={`${IMAGE_BASE_URL}${movie.poster_path}`}
